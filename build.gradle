@@ -1,0 +1,120 @@
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
+        maven {
+            name = 'impactdevelopment-repo'
+            url = 'https://impactdevelopment.github.io/maven/'
+        }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'com.github.ImpactDevelopment', name: 'ForgeGradle', version: '3.0.115'
+        classpath group: 'com.github.ImpactDevelopment', name: 'MixinGradle', version: '0.6.2'
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+
+version = '1.0'
+group = 'de.raik.tnttimer'
+archivesBaseName = 'TNT-Timer'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+def mcpVersion = [channel: 'snapshot', version: '20201028-1.16.3']
+
+mixin {
+    defaultObfuscationEnv searge
+    add sourceSets.main, "labymod.refmap.json"
+}
+
+minecraft {
+    mappings mcpVersion
+
+    reobfMappings 'notch'
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            main "net.labymod.vanilla.LabyModLauncher"
+
+            environment 'assetIndex', '{asset_index}'
+            environment 'assetDirectory', downloadAssets.output
+            environment 'nativesDirectory', extractNatives.output
+
+            environment 'tweakClass', 'net.labymod.vanilla.LabyModTweaker'
+
+            jvmArg('-Dmixin.debug=true')
+            jvmArg('-DdebugOpenGL=true')
+            jvmArg('-Djava.library.path=""')
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "spongepowered"
+        url = "https://repo.spongepowered.org/maven"
+    }
+    maven {
+        name = 'impactdevelopment-repo'
+        url = 'https://impactdevelopment.github.io/maven/'
+    }
+    mavenLocal()
+}
+
+configurations {
+    shade
+    compile.extendsFrom shade
+}
+
+
+dependencies {
+    compileOnly(files('libs/LabyMod-3-3.8.0.jar'))
+
+    minecraft 'com.github.ImpactDevelopment:Vanilla:1.16.5'
+
+    annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
+
+
+    compile("org.ow2.asm:asm-analysis:6.2") {
+        transitive = false
+    }
+    compile("org.ow2.asm:asm-util:6.2") {
+        transitive = false
+    }
+
+    compile("org.ow2.asm:asm-commons:6.2") {
+        transitive = false
+    }
+
+    compile("org.spongepowered:mixin:0.8.2") {
+        transitive = false
+    }
+    compile("net.minecraft:launchwrapper:1.12") {
+        transitive = false
+    }
+}
+
+jar {
+    configurations.shade.each {
+        dep ->
+            from(project.zipTree(dep)) {
+                exclude 'META-INF', 'META-INF/**'
+            }
+    }
+}
+
+def reobfFile = file("$buildDir/reobfJar/output.jar")
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
+}
