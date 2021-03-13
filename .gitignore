@@ -1,0 +1,8 @@
+#JetBrains
+.idea
+*.iml
+*.ipr
+
+#Gradle
+.gradle
+build
