@@ -1,0 +1,10 @@
+{
+    "uuid": "%uuid%",
+    "name": "TNT Timer",
+    "mainClass": "de.raik.tnttimer.TNTTimerAddon",
+    "description": "Displays the time until a tnt explodes over the tnt.",
+    "version": 1,
+    "author": "Sk1er LLC",
+    "category": 4,
+    "icon": "https://mineflash07.github.io/images/addons/tnttimer.png"
+}
