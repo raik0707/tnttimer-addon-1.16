@@ -1,36 +1,40 @@
 package de.raik.tnttimer.restrictions;
 
-import de.raik.tnttimer.TNTTimerAddon;
-import net.labymod.api.event.Subscribe;
-import net.labymod.api.event.events.client.gui.screen.overlay.PlayerTabListOverlayEvent;
-import net.labymod.api.event.events.network.server.DisconnectServerEvent;
+import net.labymod.core_implementation.mc116.gui.ModPlayerTabOverlay;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.ITextComponent;
+
+import java.lang.reflect.Field;
 
 public class GommeHDBedWarsRestriction implements Restriction {
 
-    private boolean isBedWars = false;
+    private static final Field HEADER_FIELD;
 
-    public GommeHDBedWarsRestriction(TNTTimerAddon addon) {
-        addon.api.getEventService().registerListener(this);
+    private final Minecraft minecraft = Minecraft.getInstance();
+
+    static {
+        Field headerField = null;
+        try {
+            headerField = ModPlayerTabOverlay.class.getDeclaredField("header");
+            headerField.setAccessible(true);
+        } catch (NoSuchFieldException ignored) {}
+
+        HEADER_FIELD = headerField;
     }
 
     @Override
     public boolean isRestricted() {
-        return this.isBedWars;
-    }
-
-    @Subscribe
-    public void onTabUpdate(PlayerTabListOverlayEvent event) {
-        if (!event.getType().equals(PlayerTabListOverlayEvent.Type.HEADER)) {
-            return;
+        ITextComponent textComponent;
+        try {
+            ModPlayerTabOverlay overlayGui = (ModPlayerTabOverlay) this.minecraft.ingameGUI.getTabList();
+            textComponent = (ITextComponent) HEADER_FIELD.get(overlayGui);
+        } catch (IllegalAccessException | ClassCastException exception) {
+            return false;
         }
+        String text = textComponent.getString().toLowerCase();
 
-        String unformattedText = event.getHeader().getUnformattedComponentText();
-        this.isBedWars = unformattedText.contains("gommehd.net") && unformattedText.contains("bedwars");
+        return text.contains("gommehd.net") && text.contains("bedwars");
     }
 
-    @Subscribe
-    public void onQuit(DisconnectServerEvent event) {
-        this.isBedWars = false;
-    }
 
 }

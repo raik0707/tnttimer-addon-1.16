@@ -21,7 +21,7 @@ public class TNTTimerAddon extends LabyModAddon {
     @Override
     public void onEnable() {
         this.api.getEventService().registerListener(new ExplosionTimeRenderer(this));
-        this.restrictions.add(new GommeHDBedWarsRestriction(this));
+        this.restrictions.add(new GommeHDBedWarsRestriction());
     }
 
     @Override

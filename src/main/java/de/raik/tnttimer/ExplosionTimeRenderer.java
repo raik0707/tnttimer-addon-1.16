@@ -21,10 +21,10 @@ public class ExplosionTimeRenderer {
 
     @Subscribe
     public void onRender(RenderEntityEvent event) {
-        if (!this.addon.isEnabled() || this.addon.isRestricted()) {
+        if (!(event.getEntity() instanceof TNTEntity)) {
             return;
         }
-        if (!(event.getEntity() instanceof TNTEntity)) {
+        if (!this.addon.isEnabled() || this.addon.isRestricted()) {
             return;
         }
 
