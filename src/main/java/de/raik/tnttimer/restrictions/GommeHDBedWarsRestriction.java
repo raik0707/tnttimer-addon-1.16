@@ -31,6 +31,10 @@ public class GommeHDBedWarsRestriction implements Restriction {
         } catch (IllegalAccessException | ClassCastException exception) {
             return false;
         }
+        if (textComponent == null) {
+            return false;
+        }
+
         String text = textComponent.getString().toLowerCase();
 
         return text.contains("gommehd.net") && text.contains("bedwars");
