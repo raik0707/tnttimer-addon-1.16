@@ -21,7 +21,7 @@ public class ExplosionTimeRenderer {
 
     @Subscribe
     public void onRender(RenderEntityEvent event) {
-        if (!this.addon.isEnabled()) {
+        if (!this.addon.isEnabled() || this.addon.isRestricted()) {
             return;
         }
         if (!(event.getEntity() instanceof TNTEntity)) {
@@ -41,7 +41,7 @@ public class ExplosionTimeRenderer {
             return Color.WHITE;
         }
 
-        float green = Math.min(tntEntity.getFuse() / 80.0F, 1F);
+        float green = Math.max(Math.min(tntEntity.getFuse() / 80.0F, 1F), 0F);
         return new Color(1F - green, green, 0F);
     }
 
